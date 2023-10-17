@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@pixi/graphics-extras": "^7.2.4",
+    "howler": "^2.2.3",
+    "pixi.js": "^7.2.4"
+  }
+}
