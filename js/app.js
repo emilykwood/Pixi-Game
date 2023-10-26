@@ -151,18 +151,16 @@ class Character {
     
 
     playRunAnimation() {
-        if(!this.runAnimation)
         this.stopAllAnimations();
         this.idleSprite.visible = false;
         this.runAnimation.visible = true;
-        this.runAnimation.gotoAndPlay(0);
+        this.runAnimationPlaying = true;
+        this.runAnimation.gotoAndPlay(0); 
     }
-
     moveRight() {
-        this.sprite.scale.x = 0.6;
         this.sprite.x += 5;
+        this.sprite.scale.x = 0.6;
     }
-
     moveLeft() {
         this.sprite.scale.x = -0.6;
         this.sprite.x -= 5;
@@ -251,7 +249,7 @@ async function startGame() {
             if (pressedKeys["32"] && !character.isJumping) {
                 character.playJumpAnimation();
             } else if (pressedKeys['39']) {
-                character.playRunAnimation();
+                character.runAnimation.gotoAndPlay(1);
                 character.moveRight();
                 groundSprite.tilePosition.x -= 3;
             } else if (pressedKeys['37']) {
