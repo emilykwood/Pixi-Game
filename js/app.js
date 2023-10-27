@@ -1,6 +1,9 @@
 let pressedKeys = {};
 let currentFrameIndex = 0;
 let speed = 2;
+let isMovingRight = false; 
+let isTitleScreenVisible = true; 
+let titleScreen;
 
 const app = new PIXI.Application({
     width: 1920,
@@ -145,18 +148,38 @@ class Character {
                 requestAnimationFrame(jumpAnimationLoop);
             };
     
-            jumpAnimationLoop(); // Start the animation loop
+            jumpAnimationLoop(); 
             }
         }
     
+        playRunAnimation() {
+            if (!this.runAnimationPlaying) {
+                this.runAnimationPlaying = true;
+                this.idleSprite.visible = false;
+                this.runAnimation.visible = true;
+                this.runAnimation.gotoAndPlay(0);
+    
+                let totalFrames = this.runAnimation.totalFrames;
+                let currentFrame = 0;
+    
+                let runAnimationLoop = () => {
+                    if (currentFrame < totalFrames) {
+                        requestAnimationFrame(runAnimationLoop);
+                    } else {
+                        this.runAnimationPlaying = false;
+                        this.runAnimation.gotoAndStop(0);
+                        this.runAnimation.visible = false;
+                        this.idleSprite.visible = true;
+                        return;
+                    }
+    
+                    currentFrame++;
+                };
+    
+                runAnimationLoop();
+            }
+        }
 
-    playRunAnimation() {
-        this.stopAllAnimations();
-        this.idleSprite.visible = false;
-        this.runAnimation.visible = true;
-        this.runAnimationPlaying = true;
-        this.runAnimation.gotoAndPlay(0); 
-    }
     moveRight() {
         this.sprite.x += 5;
         this.sprite.scale.x = 0.6;
@@ -239,17 +262,24 @@ async function startGame() {
 
         function keyDown(e) {
             pressedKeys[e.keyCode] = true;
+            if (e.keyCode === 39) {
+                isMovingRight = true;
+            }
         }
-
+        
         function keyUp(e) {
             pressedKeys[e.keyCode] = false;
+            if (e.keyCode === 39) {
+                isMovingRight = false;
+                character.stopAllAnimations();
+            }
         }
 
         function gameLoop() {
             if (pressedKeys["32"] && !character.isJumping) {
                 character.playJumpAnimation();
-            } else if (pressedKeys['39']) {
-                character.runAnimation.gotoAndPlay(1);
+            } else if (isMovingRight) {
+                character.playRunAnimation();
                 character.moveRight();
                 groundSprite.tilePosition.x -= 3;
             } else if (pressedKeys['37']) {
