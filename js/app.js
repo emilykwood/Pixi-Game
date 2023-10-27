@@ -2,8 +2,7 @@ let pressedKeys = {};
 let currentFrameIndex = 0;
 let speed = 2;
 let isMovingRight = false; 
-let isTitleScreenVisible = true; 
-let titleScreen;
+let gameStarted = false;
 
 const app = new PIXI.Application({
     width: 1920,
@@ -139,7 +138,6 @@ class Character {
                         this.sprite.y = 855;
                         this.jumpAnimationPlaying = false;
                         this.jumpAnimation.visible = false;
-                        this.idleSprite.visible = true;
                         return; 
                     }
                 }
@@ -196,6 +194,12 @@ class Character {
     }
 }
 
+function buttonClicked() {
+    gameStarted = true;
+    // document.getElementById("startScreen").style.cssText = "-webkit-animation: fadeOut 5s";
+    document.getElementById("startScreen").style.display = "none";
+}
+
 async function startGame() {
     try {
         // Load assets
@@ -230,8 +234,6 @@ async function startGame() {
         }
 
 
-        // setInterval(createClouds, 8000); 
-
         const middleGroundTexture = PIXI.Texture.from(globalAssets.middleGround);
         const middleGroundSprite = new PIXI.TilingSprite(middleGroundTexture, app.screen.width, app.screen.height);
         middleGroundSprite.scale.set(2, 2);
@@ -248,13 +250,26 @@ async function startGame() {
         const character = new Character();
         app.stage.addChild(character.sprite);
 
+        const mushroomTexture = PIXI.Texture.from(globalAssets.mushroom);
+        const mushroomSprite = new PIXI.Sprite(mushroomTexture);
+
         app.ticker.add(function () {
             for (const cloud of cloudArr) {
             cloud.x -= 0.5; 
+            if (cloud.x + cloud.width < 0) {
+                cloud.x = app.screen.width;
             }
+        }
             gameLoop()
         }); 
 
+        function spawnMushrooms() {
+            mushroomSprite.x = app.screen.width - 300;
+            mushroomSprite.y = 690;
+            app.stage.addChild(mushroomSprite);
+        }
+
+        setInterval(spawnMushrooms, 9000);
 
         // Event listeners to make character jump
         window.addEventListener("keydown", keyDown);
@@ -298,4 +313,6 @@ async function startGame() {
 startGame();
 
 
-//next steps detect collision logic  and then call gameCanvas.stop();
+//next steps 
+//work out how to do spawn mushroom logic
+// detect collision logic  and then call gameCanvas.stop();
